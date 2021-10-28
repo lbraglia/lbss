@@ -3,4 +3,6 @@
 export(ahern)
 export(cox_loghr)
 export(cox_n)
+export(cp_n)
+export(cp_width)
 export(wilson_width)
