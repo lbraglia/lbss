@@ -1,3 +1,4 @@
+#' @importFrom clinfun ph2simon
 #' @keywords internal
 "_PACKAGE"
 

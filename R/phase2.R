@@ -69,3 +69,11 @@ ahern <- function(p0, p1, alpha = 0.05, beta = 0.2, sample_sizes = 1:2000){
     data.frame(p0, p1, alpha, beta, sample_size = ss, cutoffs = res,
                lower_ci = lower_ci, lower_ci_gt_p0 = check)
 }
+
+
+#' Simon phase II design (a wrapper)
+#'
+#' Simon phase II design: a wrapper for clinfun::ph2simon
+#' @export
+simon <- function(p0, p1, alpha = 0.05, beta = 0.2, ...)
+    clinfun::ph2simon(pu = p0, pa = p1, ep1 = alpha, ep2 = beta, ...)
