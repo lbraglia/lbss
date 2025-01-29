@@ -35,25 +35,42 @@
 #' })
 #' tab51
 #'
-#'
+#' ## check of not standardized effects measures: all must be equal
+#' me_atleastone_among_two(deltas = c(0.5, 0.5), sds = c(1,1))
+#' me_atleastone_among_two(deltas = c(1,   1),   sds = c(2,2))
+#' me_atleastone_among_two(deltas = c(2,   2),   sds = c(4,4))
+#' 
 #'@export
 me_atleastone_among_two <- function(deltas = c(0.2, 0.2),
                                     sds = c(1, 1),
                                     corr = 0.5,
                                     sig_level = 0.025 / length(deltas),
                                     power = 0.8){
+  # input validation
+  stopifnot(length(deltas) == 2,
+            all(deltas > 0), # this has to be by design (see H_0, H_1 p. 8 of sozu)
+            length(sds) == 2,
+            all(sds > 0),
+            corr >= -1,
+            corr <= 1,
+            power > 0,
+            power < 1,
+            sig_level > 0,
+            sig_level < 1)
   
   std_effects <- deltas / sds
   cov <- corr * prod(sds)
-  varcov_matrix <- diag(sds^2) * (1 - cov) + cov
+  varcov_matrix <- diag(sds^2)
+  varcov_matrix[1, 2] <- varcov_matrix[2, 1] <- cov
   z_alpha <- qnorm(1 - sig_level)
-  
+
+  # difference between power and desired power
   power_atleastone_among_two <- function(n, std.effect, z.alpha, sigma, power){
     ## this function returns the difference between study power and desidered
     ## power is minimized for n
     crit_vals <- z.alpha - sqrt(n / 2) * std.effect
     ## equation pag 60 of sozu
-    (1 - mvtnorm::pmvnorm(upper = crit_vals, sigma = sigma)) - power
+    (1 - mvtnorm::pmvnorm(upper = crit_vals, corr = cov2cor(sigma))) - power
   }
   
   n <- uniroot(power_atleastone_among_two,
@@ -100,7 +117,11 @@ me_atleastone_among_two <- function(deltas = c(0.2, 0.2),
 #' 
 #' tab21
 #' 
-#'
+#' ## check of not standardized effects measures: all must be equal
+#' me_both_the_two(deltas = c(0.5, 0.5), sds = c(1,1))
+#' me_both_the_two(deltas = c(1,   1),   sds = c(2,2))
+#' me_both_the_two(deltas = c(2,   2),   sds = c(4,4))
+#' 
 #' @export
 me_both_the_two <- function(deltas = c(0.2, 0.2),
                             sds = c(1, 1),
@@ -108,9 +129,22 @@ me_both_the_two <- function(deltas = c(0.2, 0.2),
                             sig_level = 0.025,
                             power = 0.8){
   
+  # input validation
+  stopifnot(length(deltas) == 2,
+            all(deltas > 0), # this has to be by design (see H_0, H_1 p. 8 of sozu)
+            length(sds) == 2,
+            all(sds > 0),
+            corr >= -1,
+            corr <= 1,
+            power > 0,
+            power < 1,
+            sig_level > 0,
+            sig_level < 1)
+
   std_effects <- deltas / sds
   cov <- corr * prod(sds)
-  varcov_matrix <- diag(sds^2) * (1 - cov) + cov
+  varcov_matrix <- diag(sds^2)
+  varcov_matrix[1, 2] <- varcov_matrix[2, 1] <- cov
   z_alpha <- qnorm(1 - sig_level)
   
   power_both_the_two <- function(n, std.effect, z.alpha, sigma, power){
@@ -118,7 +152,7 @@ me_both_the_two <- function(deltas = c(0.2, 0.2),
     ## power is minimized for n
     crit_vals <- z.alpha - sqrt(n / 2) * std.effect
     ## equation 2.2 pag 8 of sozu
-    mvtnorm::pmvnorm(lower = crit_vals, sigma = sigma) - power
+    mvtnorm::pmvnorm(lower = crit_vals, corr = cov2cor(sigma)) - power
   }
   
   n <- uniroot(power_both_the_two,

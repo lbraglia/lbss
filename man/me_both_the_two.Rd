@@ -44,5 +44,9 @@ tab21$E2 <- apply(tab21, 1, function(row){
 
 tab21
 
+## check of not standardized effects measures: all must be equal
+me_both_the_two(deltas = c(0.5, 0.5), sds = c(1,1))
+me_both_the_two(deltas = c(1,   1),   sds = c(2,2))
+me_both_the_two(deltas = c(2,   2),   sds = c(4,4))
 
 }
